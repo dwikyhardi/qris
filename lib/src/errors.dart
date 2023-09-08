@@ -1,7 +1,9 @@
 class QRISError extends Error {
-
-  QRISError(this.code, {
-    this.tag, this.data, this.message,
+  QRISError(
+    this.code, {
+    this.tag,
+    this.data,
+    this.message,
   });
 
   static const invalidTagOrLength = 'invalid_tag_length';

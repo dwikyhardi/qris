@@ -21,14 +21,19 @@ void main() {
       // 1 * 2 * 1 * 2 * 1 * 2 * 1 * 2 * 1
       // 1 + 4 + 3 + 8 + 5 + 3 + 7 + 7 + 9
       // = 10 - (47 % 10) = 3
-      final checkDigit = int.parse(test[test.length - 1],);
+      final checkDigit = int.parse(
+        test[test.length - 1],
+      );
       final chars = test.characters;
       int multiplier = 1;
       int sum = 0;
       for (int i = 0; i < chars.length - 1; i++) {
         int factor = int.parse(
-          chars.elementAt(i,),
-        ) * multiplier;
+              chars.elementAt(
+                i,
+              ),
+            ) *
+            multiplier;
         if (factor > 9) {
           sum += 1 + factor % 10;
         } else {
@@ -36,10 +41,17 @@ void main() {
         }
         multiplier = multiplier == 1 ? 2 : 1;
       }
-      debugPrint('Sum: $sum',);
-      debugPrint('Check Digit: $checkDigit',);
+      debugPrint(
+        'Sum: $sum',
+      );
+      debugPrint(
+        'Check Digit: $checkDigit',
+      );
       final calculatedCheckDigit = 10 - (sum % 10);
-      expect(calculatedCheckDigit, checkDigit,);
+      expect(
+        calculatedCheckDigit,
+        checkDigit,
+      );
     },
   );
 }

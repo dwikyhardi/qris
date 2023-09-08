@@ -6,19 +6,26 @@
 library qris;
 
 import 'dart:convert';
+import 'package:http/http.dart' as $http;
 
 import 'package:crclib/catalog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:qris/src/components/additional_data.dart';
+import 'package:qris/src/components/currency.dart';
 import 'package:qris/src/components/initiation_point.dart';
 import 'package:qris/src/components/merchant.dart';
 import 'package:qris/src/components/tip_indicator.dart';
 import 'package:qris/src/decoder.dart';
 
-export 'src/components/initiation_point.dart' show InitiationPoint, InitiationPointUtils;
-export 'src/components/merchant_criteria.dart' show MerchantCriteria, MerchantCriteriaUtils;
-export 'src/components/pan_merchant_method.dart' show PANMerchantMethod, PANMerchantMethodUtils;
+export 'src/components/initiation_point.dart'
+    show InitiationPoint, InitiationPointUtils;
+export 'src/components/merchant_criteria.dart'
+    show MerchantCriteria, MerchantCriteriaUtils;
+export 'src/components/pan_merchant_method.dart'
+    show PANMerchantMethod, PANMerchantMethodUtils;
 export 'src/components/tip_indicator.dart' show TipIndicator, TipIndicatorUtils;
+export 'src/components/currency.dart' show Currency;
+export 'package:qris/qris.dart';
 
 export 'src/errors.dart';
 
@@ -29,22 +36,25 @@ export 'src/errors.dart';
 /// text data according to ISO/IEC 18004, which is usually obtainable after
 /// scanning a physically printed QR Codes, or the one generated dynamically
 /// from certain merchant digital devices.
-class QRIS
-    extends DecodedQRISData
-    with QRISTipIndicator, QRISInitiationPoint {
-
+class QRIS extends DecodedQRISData with QRISTipIndicator, QRISInitiationPoint {
   /// Generates a QRIS instance with parsed information, given a [data] String.
   ///
   /// Throws a [QRISError] if the provided data is not a valid String that
   /// conforms to QRIS standard.
-  QRIS(String data, {
+  QRIS(
+    String data, {
     bool lenient = false,
-  }): super(data, lenient: lenient,);
+  }) : super(
+          data,
+          lenient: lenient,
+        );
 
   /// The Payload Format Indicator, indicates the version of the QRIS Code.
   ///
   /// A valid QRIS Code must have this field.
-  int get payloadFormatIndicator => int.parse(this[0] ?? "",);
+  int get payloadFormatIndicator => int.parse(
+        this[0] ?? "",
+      );
 
   /// List of merchants associated with Primitive Payment Systems such as
   /// VISA, MasterCard, Union Pay, etc.
@@ -56,46 +66,90 @@ class QRIS
     for (int i = 2; i <= 25; i++) {
       final merchant = this[i];
       if (merchant != null) {
-        merchants.add(merchant,);
+        merchants.add(
+          merchant,
+        );
       }
     }
-    return merchants.toList(growable: false,);
+    return merchants.toList(
+      growable: false,
+    );
   }();
 
-  List<String> _getPrimitiveMerchantsByRange(int start, int end,) {
+  List<String> _getPrimitiveMerchantsByRange(
+    int start,
+    int end,
+  ) {
     final merchants = <String>[];
     for (int i = start; i <= end; i++) {
       final merchant = this[i];
       if (merchant != null) {
-        merchants.add(merchant,);
+        merchants.add(
+          merchant,
+        );
       }
     }
-    return merchants.toList(growable: false,);
+    return merchants.toList(
+      growable: false,
+    );
   }
 
   /// VISA Merchants (ID "02" and "03")
-  List<String> get visaMerchants => _getPrimitiveMerchantsByRange(2, 3,);
+  List<String> get visaMerchants => _getPrimitiveMerchantsByRange(
+        2,
+        3,
+      );
+
   /// MasterCard Merchants (ID "04" and "05)
-  List<String> get mastercardMerchants => _getPrimitiveMerchantsByRange(4, 5,);
+  List<String> get mastercardMerchants => _getPrimitiveMerchantsByRange(
+        4,
+        5,
+      );
+
   /// EMVCo Merchants (ID "06" - "08")
-  List<String> get emvCoMerchants => _getPrimitiveMerchantsByRange(6, 8,);
+  List<String> get emvCoMerchants => _getPrimitiveMerchantsByRange(
+        6,
+        8,
+      );
+
   /// Discover Credit Card Merchants (ID "09" and "10")
-  List<String> get discoverMerchants => _getPrimitiveMerchantsByRange(9, 10,);
+  List<String> get discoverMerchants => _getPrimitiveMerchantsByRange(
+        9,
+        10,
+      );
+
   /// AMEX (American Express) Merchants (ID "11" and "12")
-  List<String> get amExMerchants => _getPrimitiveMerchantsByRange(11, 12,);
+  List<String> get amExMerchants => _getPrimitiveMerchantsByRange(
+        11,
+        12,
+      );
+
   /// JCB (Japan Credit Bureau) Merchants (ID "13" and "14")
-  List<String> get jcbMerchants => _getPrimitiveMerchantsByRange(13, 14,);
+  List<String> get jcbMerchants => _getPrimitiveMerchantsByRange(
+        13,
+        14,
+      );
+
   /// Union Pay Merchants (ID "15" and "16")
-  List<String> get unionPayMerchants => _getPrimitiveMerchantsByRange(15, 16,);
+  List<String> get unionPayMerchants => _getPrimitiveMerchantsByRange(
+        15,
+        16,
+      );
+
   /// EMVCo Merchants (ID "17" - "25")
-  List<String> get emvCoMerchants2 => _getPrimitiveMerchantsByRange(17, 25,);
+  List<String> get emvCoMerchants2 => _getPrimitiveMerchantsByRange(
+        17,
+        25,
+      );
 
   late final Map<int, Merchant> _merchants = () {
     final merchants = <int, Merchant>{};
     for (int i = 26; i <= 50; i++) {
       final data = this[i];
       if (data != null) {
-        merchants[i] = Merchant(data,);
+        merchants[i] = Merchant(
+          data,
+        );
       }
     }
     return merchants;
@@ -103,37 +157,52 @@ class QRIS
 
   /// All available non-primitive merchants listed on this QRIS Code
   List<Merchant> get merchants => _merchants.values.toList(
-    growable: false,
-  );
+        growable: false,
+      );
 
-  List<Merchant> _getMerchantsByRange(int start, int end,) {
+  List<Merchant> _getMerchantsByRange(
+    int start,
+    int end,
+  ) {
     final merchants = <Merchant>[];
     for (int i = start; i <= end; i++) {
       final merchant = _merchants[i];
       if (merchant != null) {
-        merchants.add(merchant,);
+        merchants.add(
+          merchant,
+        );
       }
     }
-    return merchants.toList(growable: false,);
+    return merchants.toList(
+      growable: false,
+    );
   }
 
   /// Domestic Merchants, most common QRIS Codes are used by domestic merchants (ID "26" - "45")
-  List<Merchant> get domesticMerchants => _getMerchantsByRange(26, 45,);
+  List<Merchant> get domesticMerchants => _getMerchantsByRange(
+        26,
+        45,
+      );
+
   /// Additional Domestic Merchants information as reserve list, usually empty (ID "46" - "50")
-  List<Merchant> get reservedDomesticMerchants => _getMerchantsByRange(46, 50,);
+  List<Merchant> get reservedDomesticMerchants => _getMerchantsByRange(
+        46,
+        50,
+      );
 
   /// Merchant Account Information Domestic Central Repository
   ///
   /// If [merchants] is empty, then most likely there's a single Merchant Account
   /// available at ID "51". (No merchant information between ID "02" to "45")
-  late final Merchant? merchantAccountDomestic = this[51] != null
-      ? Merchant(this[51]!)
-      : null;
+  late final Merchant? merchantAccountDomestic =
+      this[51] != null ? Merchant(this[51]!) : null;
 
   /// Merchant Category Code (MCC in short)
   ///
   /// Code references are available at [https://github.com/greggles/mcc-codes/](https://github.com/greggles/mcc-codes/)
-  int? get merchantCategoryCode => int.tryParse(this[52] ?? "",);
+  int? get merchantCategoryCode => int.tryParse(
+        this[52] ?? "",
+      );
 
   /// The Transaction Currency, conforms to ISO 4217, represented as 3 digits Numeric.
   ///
@@ -141,18 +210,50 @@ class QRIS
   /// Reference: [https://en.wikipedia.org/wiki/ISO_4217](https://en.wikipedia.org/wiki/ISO_4217)
   String? get transactionCurrency => this[53];
 
+  Future<Currency> getTransactionCurrency() async {
+    var response = await $http.get(
+      Uri.parse(
+          'https://restcountries.com/v3.1/alpha/$transactionCurrency?fields=name,currencies'),
+    );
+
+    debugPrint('response.body: ${response.body}');
+    debugPrint('response.body Map: ${jsonDecode(response.body)}');
+    debugPrint('statusCode: ${response.statusCode}');
+
+    var data = jsonDecode(response.body);
+    debugPrint('response.body Map: ${data['name']}');
+    debugPrint('response.body Map: ${data['currencies']}');
+    debugPrint('response.body Map: ${(data['currencies'] as Map).keys.first}');
+    debugPrint(
+        'response.body Map: ${data['currencies'][(data['currencies'] as Map).keys.first]['name']}');
+    debugPrint(
+        'response.body Map: ${data['currencies'][(data['currencies'] as Map).keys.first]['symbol']}');
+
+    return Currency(
+      data['currencies'][(data['currencies'] as Map).keys.first]['name'],
+      (data['currencies'] as Map).keys.first,
+      data['currencies'][(data['currencies'] as Map).keys.first]['symbol'],
+    );
+  }
+
   num? _userInputTransactionAmount;
 
   /// The transaction amount contained within this QRIS, or the one entered manually
   /// through [transactionAmount]'s setter, if any.
-  num? get transactionAmount => _userInputTransactionAmount ?? originalTransactionAmount;
+  num? get transactionAmount =>
+      _userInputTransactionAmount ?? originalTransactionAmount;
 
   /// Set the transaction amount to override the [originalTransactionAmount]
-  set transactionAmount(num? amount,) => _userInputTransactionAmount = amount;
+  set transactionAmount(
+    num? amount,
+  ) =>
+      _userInputTransactionAmount = amount;
 
   /// The original transaction amount available within this QRIS, fetched from
   /// the raw data, if available.
-  late final num? originalTransactionAmount = num.tryParse(this[54] ?? "",);
+  late final num? originalTransactionAmount = num.tryParse(
+    this[54] ?? "",
+  );
 
   num inferTipAmount({
     bool useOriginalAmount = true,
@@ -163,7 +264,10 @@ class QRIS
       case TipIndicator.tipValueFixed:
         return tipValueOfFixed ?? 0;
       case TipIndicator.tipValuePercentage:
-        final amount = (useOriginalAmount ? originalTransactionAmount : transactionAmount) ?? 0;
+        final amount = (useOriginalAmount
+                ? originalTransactionAmount
+                : transactionAmount) ??
+            0;
         final pct = tipValueOfPercentage ?? 0;
         return pct / 100 * amount;
       case null:
@@ -190,17 +294,25 @@ class QRIS
 
   /// Additional data that complements the QRIS data with more technical details.
   late final AdditionalData? additionalDataField = this[62] != null
-      ? AdditionalData(this[62]!,)
+      ? AdditionalData(
+          this[62]!,
+        )
       : null;
 
   /// The additional information about the merchant, represented in a preferred
   /// language preference.
-  late final LocalizedMerchantInfo? merchantInformationLocalized = this[64] != null
-      ? LocalizedMerchantInfo(this[64]!,)
-      : null;
+  late final LocalizedMerchantInfo? merchantInformationLocalized =
+      this[64] != null
+          ? LocalizedMerchantInfo(
+              this[64]!,
+            )
+          : null;
 
   /// The CRC Checksum of the QRIS Code contents as [int].
-  late final int? crc = int.tryParse(this[63] ?? '', radix: 16,);
+  late final int? crc = int.tryParse(
+    this[63] ?? '',
+    radix: 16,
+  );
 
   /// The CRC Checksum of the QRIS Code contents as Hex String
   String? get crcHex => this[63];
@@ -211,12 +323,24 @@ class QRIS
     final crc = crcHex;
     if (crc != null) {
       final raw = toString();
-      final match = RegExp(r'^.+63\d{2}',).firstMatch(raw,)?.group(0,);
+      final match = RegExp(
+        r'^.+63\d{2}',
+      )
+          .firstMatch(
+            raw,
+          )
+          ?.group(
+            0,
+          );
       if (match != null) {
         final result = Crc16Ibm3740().convert(
-          utf8.encode(match,),
+          utf8.encode(
+            match,
+          ),
         );
-        return result.toRadixString(16,);
+        return result.toRadixString(
+          16,
+        );
       }
     }
     return null;
@@ -230,20 +354,37 @@ class QRIS
     return false;
   }
 
-  static String? _calculateCRC(String data,) {
-    final match = RegExp(r'^.+63\d{2}',).firstMatch(data,)?.group(0,);
+  static String? _calculateCRC(
+    String data,
+  ) {
+    final match = RegExp(
+      r'^.+63\d{2}',
+    )
+        .firstMatch(
+          data,
+        )
+        ?.group(
+          0,
+        );
     if (match != null) {
       final result = Crc16Ibm3740().convert(
-        utf8.encode(match,),
+        utf8.encode(
+          match,
+        ),
       );
-      return result.toRadixString(16,);
+      return result.toRadixString(
+        16,
+      );
     }
     return null;
   }
 
   /// CRC validation using Isolate
   Future<bool> get isCRCValidAsync async {
-    final calculated = await compute(_calculateCRC, toString(),);
+    final calculated = await compute(
+      _calculateCRC,
+      toString(),
+    );
     if (calculated != null) {
       return calculated.toUpperCase() == crcHex?.toUpperCase();
     }
@@ -252,9 +393,13 @@ class QRIS
 
   List<String> get emvCo {
     return List.generate(
-      15, (index) => index + 65,
-    ).map(
-      (e) => this[e],
-    ).whereType<String>().toList();
+      15,
+      (index) => index + 65,
+    )
+        .map(
+          (e) => this[e],
+        )
+        .whereType<String>()
+        .toList();
   }
 }

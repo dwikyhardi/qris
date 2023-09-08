@@ -4,14 +4,15 @@ import 'dart:collection';
 enum TipIndicator {
   /// The mobile app should ask for consumer's confirmation to provide the tip amount.
   mobileAppRequiresConfirmation,
+
   /// The tip value must be a fixed numeric amount.
   tipValueFixed,
+
   /// The tip value must be calculated as percentage amount between 00.01 - 99.99%.
   tipValuePercentage,
 }
 
 extension TipIndicatorUtils on TipIndicator {
-
   String get code {
     switch (this) {
       case TipIndicator.mobileAppRequiresConfirmation:
@@ -25,16 +26,18 @@ extension TipIndicatorUtils on TipIndicator {
 }
 
 mixin QRISTipIndicator on MapBase<int, String> {
-
   /// The [TipIndicator] of the QRIS Code.
   ///
   /// Indicates the origin of the provided Tip to the merchant, if available.
   late final TipIndicator? tipIndicator = () {
     final data = this[55];
     switch (data) {
-      case "01": return TipIndicator.mobileAppRequiresConfirmation;
-      case "02": return TipIndicator.tipValueFixed;
-      case "03": return TipIndicator.tipValuePercentage;
+      case "01":
+        return TipIndicator.mobileAppRequiresConfirmation;
+      case "02":
+        return TipIndicator.tipValueFixed;
+      case "03":
+        return TipIndicator.tipValuePercentage;
     }
     return null;
   }();
@@ -43,7 +46,9 @@ mixin QRISTipIndicator on MapBase<int, String> {
   late final num? tipValueOfFixed = () {
     final data = this[56];
     if (data != null) {
-      return num.tryParse(data,);
+      return num.tryParse(
+        data,
+      );
     }
     return null;
   }();
@@ -54,7 +59,9 @@ mixin QRISTipIndicator on MapBase<int, String> {
   late final double? tipValueOfPercentage = () {
     final data = this[57];
     if (data != null) {
-      return double.tryParse(data,);
+      return double.tryParse(
+        data,
+      );
     }
     return null;
   }();

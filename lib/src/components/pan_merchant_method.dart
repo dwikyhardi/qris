@@ -6,24 +6,31 @@ import 'package:qris/src/components/merchant.dart';
 /// Represents the Transaction/Payment Method using this QRIS Code
 enum PANMerchantMethod {
   unspecified,
+
   /// Debit Cards
   debit,
+
   /// Credit Cards
   credit,
+
   /// Common/Popular Electronic Money Providers, e.g: GoPay, OVO, DANA, etc
   electronicMoney,
+
   /// Reserved for Future Use
   rfu,
 }
 
 extension PANMerchantMethodUtils on PANMerchantMethod {
-
   int get indicator {
     switch (this) {
-      case PANMerchantMethod.unspecified: return 0;
-      case PANMerchantMethod.debit: return 1;
-      case PANMerchantMethod.credit: return 2;
-      case PANMerchantMethod.electronicMoney: return 3;
+      case PANMerchantMethod.unspecified:
+        return 0;
+      case PANMerchantMethod.debit:
+        return 1;
+      case PANMerchantMethod.credit:
+        return 2;
+      case PANMerchantMethod.electronicMoney:
+        return 3;
       // TODO: Add [rfu] handler
       default:
         return 0;
@@ -33,22 +40,27 @@ extension PANMerchantMethodUtils on PANMerchantMethod {
 
 /// See [Merchant]
 mixin PANCodeMixin on MapBase<int, String> {
-
   /// Personal Account Number (PAN)
   String? get panCode => this[1];
 
   int? get _panMerchantMethod {
-    return int.tryParse('${panCode?[8]}',);
+    return int.tryParse(
+      '${panCode?[8]}',
+    );
   }
 
   /// The main transaction/payment method.
   late final PANMerchantMethod panMerchantMethod = () {
     final code = _panMerchantMethod;
     switch (code) {
-      case 0: return PANMerchantMethod.unspecified;
-      case 1: return PANMerchantMethod.debit;
-      case 2: return PANMerchantMethod.credit;
-      case 3: return PANMerchantMethod.electronicMoney;
+      case 0:
+        return PANMerchantMethod.unspecified;
+      case 1:
+        return PANMerchantMethod.debit;
+      case 2:
+        return PANMerchantMethod.credit;
+      case 3:
+        return PANMerchantMethod.electronicMoney;
       default:
         if (code != null) {
           if (code >= 4 && code <= 9) {
@@ -64,7 +76,10 @@ mixin PANCodeMixin on MapBase<int, String> {
     final panCode = this.panCode;
     if (panCode != null) {
       if (panCode.length >= 8) {
-        return panCode.substring(0, 8,);
+        return panCode.substring(
+          0,
+          8,
+        );
       }
     }
     return null;
@@ -75,7 +90,10 @@ mixin PANCodeMixin on MapBase<int, String> {
   late final String? currencyCode = () {
     final nns = nationalNumberingSystemDigits;
     if (nns != null && nns.length >= 4) {
-      return nns.substring(1, 4,);
+      return nns.substring(
+        1,
+        4,
+      );
     }
     return null;
   }();
@@ -87,7 +105,10 @@ mixin PANCodeMixin on MapBase<int, String> {
   late final String? institutionCode = () {
     final nns = nationalNumberingSystemDigits;
     if (nns != null && nns.length >= 8) {
-      return nns.substring(4, 8,);
+      return nns.substring(
+        4,
+        8,
+      );
     }
     return null;
   }();
@@ -99,7 +120,10 @@ mixin PANCodeMixin on MapBase<int, String> {
   String? get merchantSequence {
     final pan = panCode;
     if (pan != null) {
-      return pan.substring(9, pan.length - 1,);
+      return pan.substring(
+        9,
+        pan.length - 1,
+      );
     }
     return null;
   }
@@ -110,7 +134,9 @@ mixin PANCodeMixin on MapBase<int, String> {
   int? get checkDigit {
     final pan = panCode;
     if (pan?.isNotEmpty ?? false) {
-      return int.tryParse(pan![pan.length - 1],);
+      return int.tryParse(
+        pan![pan.length - 1],
+      );
     }
     return null;
   }
@@ -128,8 +154,11 @@ mixin PANCodeMixin on MapBase<int, String> {
       int sum = 0;
       for (int i = 0; i < chars.length - 1; i++) {
         int factor = int.parse(
-          chars.elementAt(i,),
-        ) * multiplier;
+              chars.elementAt(
+                i,
+              ),
+            ) *
+            multiplier;
         if (factor > 9) {
           sum += 1 + factor % 10;
         } else {

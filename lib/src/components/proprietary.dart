@@ -2,7 +2,6 @@ import 'package:qris/src/decoder.dart';
 
 /// Additional information for Acquirer's purposes.
 class ProprietaryData extends DecodedQRISData {
-
   ProprietaryData(String data) : super(data);
 
   /// Unique Identifier for this Proprietary Data. Mostly defaults to "00".

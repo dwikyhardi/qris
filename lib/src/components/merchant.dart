@@ -7,12 +7,12 @@ import 'package:qris/src/decoder.dart';
 ///
 /// Plain merchants usually only have a single Merchant Account embedded in the
 /// QRIS code.
-class Merchant
-    extends DecodedQRISData
+class Merchant extends DecodedQRISData
     with MerchantCriteriaMixin, PANCodeMixin {
-
   /// Creates Merchant instance from a QRIS subtag information
-  Merchant(String data,): super(data);
+  Merchant(
+    String data,
+  ) : super(data);
 
   /// Merchant identifier in the form of reverse domain name. Usually presented
   /// in UPPER-CASED.
@@ -30,7 +30,9 @@ class Merchant
   late final NationalMerchantIdentifier? nationalMerchantId = () {
     if (id != null) {
       try {
-        return NationalMerchantIdentifier._(id!,);
+        return NationalMerchantIdentifier._(
+          id!,
+        );
       } catch (_) {}
     }
     return null;
@@ -50,21 +52,30 @@ class Merchant
 
 /// National Merchant Identifier contained within Entry ID 51 of the QRIS.
 class NationalMerchantIdentifier {
-
-  NationalMerchantIdentifier._(String data,): _raw = data {
+  NationalMerchantIdentifier._(
+    String data,
+  ) : _raw = data {
     String? countryCode;
     int? entityTypeCode;
     int? centuryCode;
     String? generatedYearLastTwoDigits;
     String? sequenceNumberAndCheckDigit;
     final i = data.characters.iterator;
-    if (i.moveNext(2,)) {
+    if (i.moveNext(
+      2,
+    )) {
       countryCode = i.currentCharacters.string;
       if (i.moveNext()) {
-        entityTypeCode = int.tryParse(i.currentCharacters.string,);
+        entityTypeCode = int.tryParse(
+          i.currentCharacters.string,
+        );
         if (i.moveNext()) {
-          centuryCode = int.tryParse(i.currentCharacters.string,);
-          if (i.moveNext(2,)) {
+          centuryCode = int.tryParse(
+            i.currentCharacters.string,
+          );
+          if (i.moveNext(
+            2,
+          )) {
             generatedYearLastTwoDigits = i.currentCharacters.string;
             sequenceNumberAndCheckDigit = i.stringAfter;
           }
@@ -108,7 +119,6 @@ class NationalMerchantIdentifier {
 /// Information of the Main Merchant, presented in a preferred language setting.
 ///
 class LocalizedMerchantInfo extends DecodedQRISData {
-
   LocalizedMerchantInfo(String data) : super(data);
 
   /// The preferred language, presented in ISO 639 standard (two letters alphabet).

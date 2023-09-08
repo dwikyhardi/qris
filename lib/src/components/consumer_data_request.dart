@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 mixin AdditionalConsumerDataRequestMixin on UnmodifiableMapBase<int, String> {
-
   /// Additional information to assist with the transaction completion.
   ///
   /// Example use case, such as providing a flag indicating that the user has to
@@ -18,16 +17,27 @@ mixin AdditionalConsumerDataRequestMixin on UnmodifiableMapBase<int, String> {
 
   final Map<String, bool> _consumerFlags = {};
 
-  bool _checkAndAssignFlag(String flag,) {
-    var _flag = _consumerFlags[flag];
-    _flag ??= additionalConsumerDataRequest?.contains(flag,) ?? false;
-    _consumerFlags[flag] ??= _flag;
-    return _flag;
+  bool _checkAndAssignFlag(
+    String flag,
+  ) {
+    var flags = _consumerFlags[flag];
+    flags ??= additionalConsumerDataRequest?.contains(
+          flag,
+        ) ??
+        false;
+    _consumerFlags[flag] ??= flags;
+    return flags;
   }
 
-  bool get consumerAddressRequired => _checkAndAssignFlag('A',);
+  bool get consumerAddressRequired => _checkAndAssignFlag(
+        'A',
+      );
 
-  bool get consumerPhoneRequired => _checkAndAssignFlag('M',);
+  bool get consumerPhoneRequired => _checkAndAssignFlag(
+        'M',
+      );
 
-  bool get consumerEmailRequired => _checkAndAssignFlag('E',);
+  bool get consumerEmailRequired => _checkAndAssignFlag(
+        'E',
+      );
 }

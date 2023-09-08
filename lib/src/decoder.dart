@@ -5,19 +5,30 @@ import 'package:flutter/widgets.dart' show StringCharacters;
 import 'package:qris/src/errors.dart';
 
 class QRISDecoder extends Converter<String, Map<int, String>> {
-
-  const QRISDecoder({this.lenient = false,});
+  const QRISDecoder({
+    this.lenient = false,
+  });
 
   @override
   Map<int, String> convert(String input) {
     final i = input.characters.iterator;
     final result = <int, String>{};
     try {
-      while (i.moveNext(2,)) {
-        int id = int.parse(i.currentCharacters.string,);
-        if (i.moveNext(2,)) {
-          int length = int.parse(i.currentCharacters.string,);
-          if (i.moveNext(length,)) {
+      while (i.moveNext(
+        2,
+      )) {
+        int id = int.parse(
+          i.currentCharacters.string,
+        );
+        if (i.moveNext(
+          2,
+        )) {
+          int length = int.parse(
+            i.currentCharacters.string,
+          );
+          if (i.moveNext(
+            length,
+          )) {
             result[id] = i.currentCharacters.string;
             continue;
           }
@@ -32,12 +43,14 @@ class QRISDecoder extends Converter<String, Map<int, String>> {
       }
       throw QRISError(
         QRISError.invalidTagOrLength,
-        message: 'Unexpected tag/length at ${i.stringBeforeLength} (Last tag: $lastTag)',
+        message:
+            'Unexpected tag/length at ${i.stringBeforeLength} (Last tag: $lastTag)',
       );
     }
     if (!lenient && i.stringAfterLength > 0) {
       throw QRISError(
-        QRISError.malformedQRIS, message: 'Unexpected characters "${i.stringAfter}"',
+        QRISError.malformedQRIS,
+        message: 'Unexpected characters "${i.stringAfter}"',
       );
     }
     return result;
@@ -49,15 +62,18 @@ class QRISDecoder extends Converter<String, Map<int, String>> {
 /// Base class for containing a decoded QRIS information (main or subtag) using
 /// [QRISDecoder]
 abstract class DecodedQRISData extends UnmodifiableMapBase<int, String> {
-
   /// Create a decoded [Map] of raw [String] data containing information of
   /// QRIS or it's subtag(s)
-  DecodedQRISData(String data, {
+  DecodedQRISData(
+    String data, {
     bool lenient = false,
-  })
-      : _raw = data,
+  })  : _raw = data,
         _internal = Map.unmodifiable(
-          QRISDecoder(lenient: lenient,).convert(data,),
+          QRISDecoder(
+            lenient: lenient,
+          ).convert(
+            data,
+          ),
         );
 
   /// Fetch an entry by subtag
@@ -69,8 +85,11 @@ abstract class DecodedQRISData extends UnmodifiableMapBase<int, String> {
   Iterable<int> get keys => _internal.keys;
 
   Map<String, dynamic> toEncodable() => _internal.map(
-    (key, value) => MapEntry(key.toString(), value,),
-  );
+        (key, value) => MapEntry(
+          key.toString(),
+          value,
+        ),
+      );
 
   /// Returns the base data
   @override

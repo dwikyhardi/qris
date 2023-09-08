@@ -9,16 +9,16 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qris/qris.dart';
 
 void main() {
-  runApp(const QRISDemoApp(),);
+  runApp(
+    const QRISDemoApp(),
+  );
 }
 
 class QRISDemoApp extends StatelessWidget {
-
   const QRISDemoApp();
 
   @override
   Widget build(BuildContext context) {
-
     const defaultBorder = OutlineInputBorder();
 
     return MaterialApp(
@@ -26,7 +26,9 @@ class QRISDemoApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         elevatedButtonTheme: const ElevatedButtonThemeData(
           style: ButtonStyle(
-            iconColor: MaterialStatePropertyAll(Colors.white,),
+            iconColor: MaterialStatePropertyAll(
+              Colors.white,
+            ),
           ),
         ),
         inputDecorationTheme: const InputDecorationTheme(
@@ -37,7 +39,8 @@ class QRISDemoApp extends StatelessWidget {
           focusedErrorBorder: defaultBorder,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: 12.0, vertical: 8.0,
+            horizontal: 12.0,
+            vertical: 8.0,
           ),
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -45,7 +48,9 @@ class QRISDemoApp extends StatelessWidget {
         ),
         listTileTheme: ListTileThemeData(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0,),
+            borderRadius: BorderRadius.circular(
+              16.0,
+            ),
             side: const BorderSide(
               color: Colors.black12,
             ),
@@ -58,7 +63,6 @@ class QRISDemoApp extends StatelessWidget {
 }
 
 class QRISDemoPage extends StatefulWidget {
-
   const QRISDemoPage();
 
   @override
@@ -68,27 +72,34 @@ class QRISDemoPage extends StatefulWidget {
 class _QRISDemoPageState extends State<QRISDemoPage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QRIS Scanner Demo',),
+        title: const Text(
+          'QRIS Scanner Demo',
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0,),
+        padding: const EdgeInsets.all(
+          24.0,
+        ),
         child: Column(
           children: [
             TextField(
               decoration: InputDecoration(
                 labelText: 'Reading Result (Raw)',
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.copy,),
+                  icon: const Icon(
+                    Icons.copy,
+                  ),
                   onPressed: () {
                     final result = resultController.text.trim();
                     if (result.isEmpty) {
                       return;
                     }
                     Clipboard.setData(
-                      ClipboardData(text: result,),
+                      ClipboardData(
+                        text: result,
+                      ),
                     );
                   },
                 ),
@@ -97,7 +108,9 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
               readOnly: true,
               maxLines: 5,
             ),
-            const SizedBox(height: 24.0,),
+            const SizedBox(
+              height: 24.0,
+            ),
             Expanded(
               child: Builder(
                 builder: (_) {
@@ -112,10 +125,21 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
                   }
                   final map = qris.toEncodable().entries;
                   return ListView.separated(
-                    separatorBuilder: (_, __,) => const SizedBox(height: 12.0,),
+                    separatorBuilder: (
+                      _,
+                      __,
+                    ) =>
+                        const SizedBox(
+                      height: 12.0,
+                    ),
                     itemCount: map.length,
-                    itemBuilder: (_, idx,) {
-                      final entry = map.elementAt(idx,);
+                    itemBuilder: (
+                      _,
+                      idx,
+                    ) {
+                      final entry = map.elementAt(
+                        idx,
+                      );
                       final value = '${entry.value}';
                       return ListTile(
                         leading: Text(
@@ -125,17 +149,23 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
                             color: Colors.blue,
                           ),
                         ),
-                        title: Text(value,),
+                        title: Text(
+                          value,
+                        ),
                         trailing: IconButton(
                           onPressed: () {
                             if (value.isEmpty) {
                               return;
                             }
                             Clipboard.setData(
-                              ClipboardData(text: value,),
+                              ClipboardData(
+                                text: value,
+                              ),
                             );
                           },
-                          icon: const Icon(Icons.copy,),
+                          icon: const Icon(
+                            Icons.copy,
+                          ),
                         ),
                       );
                     },
@@ -156,12 +186,21 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
                 }
                 return;
               }
-              Navigator.of(context,).push(
+              Navigator.of(
+                context,
+              )
+                  .push(
                 MaterialPageRoute(
-                  builder: (_,) => const QRISScannerPage(),
+                  builder: (
+                    _,
+                  ) =>
+                      const QRISScannerPage(),
                 ),
-              ).then(
-                (result,) {
+              )
+                  .then(
+                (
+                  result,
+                ) {
                   if (result is QRIS) {
                     resultController.text = result.toString();
                     setState(() {
@@ -173,7 +212,9 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
             },
           );
         },
-        child: const Icon(Icons.qr_code_2,),
+        child: const Icon(
+          Icons.qr_code_2,
+        ),
       ),
     );
   }
@@ -190,23 +231,21 @@ class _QRISDemoPageState extends State<QRISDemoPage> {
 }
 
 class QRISScannerPage extends StatefulWidget {
-
   const QRISScannerPage();
 
   @override
   State<QRISScannerPage> createState() => _QRISScannerPageState();
 }
 
-class _QRISScannerPageState
-    extends State<QRISScannerPage>
+class _QRISScannerPageState extends State<QRISScannerPage>
     with WidgetsBindingObserver {
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QR Scanner',),
+        title: const Text(
+          'QR Scanner',
+        ),
       ),
       body: Stack(
         children: [
@@ -217,7 +256,9 @@ class _QRISScannerPageState
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 64.0,),
+            padding: const EdgeInsets.only(
+              bottom: 64.0,
+            ),
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Row(
@@ -225,15 +266,22 @@ class _QRISScannerPageState
                 children: [
                   ValueListenableBuilder(
                     valueListenable: controller.torchState,
-                    builder: (context, state, _,) {
-
+                    builder: (
+                      context,
+                      state,
+                      _,
+                    ) {
                       late final Widget icon;
                       switch (state) {
                         case TorchState.off:
-                          icon = const Icon(Icons.flash_on,);
+                          icon = const Icon(
+                            Icons.flash_on,
+                          );
                           break;
                         case TorchState.on:
-                          icon = const Icon(Icons.flash_off,);
+                          icon = const Icon(
+                            Icons.flash_off,
+                          );
                           break;
                       }
 
@@ -245,7 +293,9 @@ class _QRISScannerPageState
                   ),
                   ElevatedButton(
                     onPressed: readFromImage,
-                    child: const Icon(Icons.image,),
+                    child: const Icon(
+                      Icons.image,
+                    ),
                   ),
                 ],
               ),
@@ -262,13 +312,21 @@ class _QRISScannerPageState
     ],
   );
 
-  void onDetect(BarcodeCapture barcodes,) {
+  void onDetect(
+    BarcodeCapture barcodes,
+  ) {
     for (var barcode in barcodes.barcodes) {
       final rawValue = barcode.rawValue;
       if (rawValue != null) {
         try {
-          final qris = QRIS(rawValue,);
-          Navigator.of(context,).pop(qris,);
+          final qris = QRIS(
+            rawValue,
+          );
+          Navigator.of(
+            context,
+          ).pop(
+            qris,
+          );
           break;
         } catch (_) {
           print(_);
@@ -304,8 +362,12 @@ class _QRISScannerPageState
       );
       if (data != null) {
         // ignore: use_build_context_synchronously
-        Navigator.of(context,).pop(
-          QRIS(data,),
+        Navigator.of(
+          context,
+        ).pop(
+          QRIS(
+            data,
+          ),
         );
       }
     }
@@ -324,6 +386,8 @@ class _QRISScannerPageState
         controller.stop();
         break;
       case AppLifecycleState.detached:
+        break;
+      case AppLifecycleState.hidden:
         break;
     }
   }

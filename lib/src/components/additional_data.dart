@@ -5,11 +5,12 @@ import 'proprietary.dart';
 
 /// Additional data that supports the current QRIS transaction with more
 /// technical details.
-class AdditionalData
-    extends DecodedQRISData
+class AdditionalData extends DecodedQRISData
     with AdditionalConsumerDataRequestMixin {
-
-  AdditionalData(String data) : super(data,);
+  AdditionalData(String data)
+      : super(
+          data,
+        );
 
   /// Bill Number or Invoice Number.
   ///
@@ -60,7 +61,9 @@ class AdditionalData
   late final ProprietaryData? proprietaryData = () {
     final data = this[99];
     if (data != null) {
-      return ProprietaryData(data,);
+      return ProprietaryData(
+        data,
+      );
     }
     return null;
   }();
